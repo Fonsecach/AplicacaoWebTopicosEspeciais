@@ -1,16 +1,38 @@
 @Backend_HostAddress = http://localhost:5027
-
-GET {{Backend_HostAddress}}/api/produto/listar
-Accept: application/json
+###
+# Listar todos os produtos
+GET {{Backend_HostAddress}}/api/produtos
 
 ###
-
-GET {{Backend_HostAddress}}/api/produto/buscar/x97
-Accept: application/json
-
-###
-
-POST  {{Backend_HostAddress}}/api/produto/cadastro
-Accept: application/json
+# Buscar um produto pelo ID
+GET {{Backend_HostAddress}}/api/produto/a12
 
 ###
+# Cadastrar um novo produto
+POST {{Backend_HostAddress}}/api/produto
+Content-Type: application/json
+
+{
+  "Id": "a15",
+  "Nome": "Smartwatch",
+  "Marca": "Samsung",
+  "Modelo": "Galaxy Watch",
+  "Preco": 1500.00
+}
+
+###
+# Alterar um produto pelo ID
+PUT {{Backend_HostAddress}}/api/produto/a15
+Content-Type: application/json
+
+{
+  "Id": "a15",
+  "Nome": "Smartwatch",
+  "Marca": "Samsung",
+  "Modelo": "Galaxy Watch 2",
+  "Preco": 1700.00
+}
+
+###
+# Remover um produto pelo ID
+DELETE {{Backend_HostAddress}}/api/produto/a15

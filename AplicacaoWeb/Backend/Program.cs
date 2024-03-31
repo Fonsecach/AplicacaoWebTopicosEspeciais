@@ -1,41 +1,73 @@
 using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 
-
-List<Produto> produtos =
-[
+List<Produto> produtos = new List<Produto>
+{
     new Produto("a12", "Iphone", "15-Pro", 15000.00m),
     new Produto("a13", "Notebook", "Vaio", 2500.00m),
     new Produto("a14", "Notebook", "Dell", 4000.00m),
     new Produto("x97", "PlayStation", "5", 5000.00m)
-];
+};
 
-//end points - funcionalidades - retorna dados no formato JSON
-app.MapGet("/api/produto/listar", () => produtos);
+app.MapGet("/api/produtos", () => produtos);
 
-app.MapGet("/api/produto/buscar/{id}", ([FromRoute] string id) =>
+app.MapGet("/api/produto/{id}", ([FromRoute] string id) =>
 {
-    //verifica o id, caso positivo vai retornar 200 e o dado, caso contrário retorna 404
-    for (int i = 0; i < produtos.Count; i++)
+    var produto = produtos.FirstOrDefault(p => p.Id == id);
+    if (produto != null)
     {
-        if (produtos[i].Id == id)
-        {
-            return Results.Ok(produtos[i]);
-        }
+        return Results.Ok(produto);
     }
-    return Results.NotFound();
+    else
+    {
+        return Results.NotFound("Produto não encontrado.");
+    }
 });
-//Fazer o cadastro de um produto na lista
-//a) atraves das informações na URL
-//b) atraves do corpo da requisição
 
-app.MapPost("/api/produto/cadastro", () => "Minha primeira aplicação");
+app.MapPost("/api/produto", ([FromBody] Produto novoProduto) => 
+{
+    if (novoProduto == null)
+    {
+        return Results.BadRequest("O produto enviado é inválido.");
+    }
 
-//Realizar as operações de alterações e remoção da lista
+    produtos.Add(novoProduto);
+    return Results.Ok(novoProduto);
+});
+
+app.MapPut("/api/produto/{id}", ([FromRoute] string id, [FromBody] Produto produtoAlterado) =>
+{
+    var index = produtos.FindIndex(p => p.Id == id);
+    if (index != -1)
+    {
+        produtos[index] = produtoAlterado;
+        return Results.Ok(produtoAlterado);
+    }
+    else
+    {
+        return Results.NotFound("Produto não encontrado.");
+    }
+});
+
+app.MapDelete("/api/produto/{id}", ([FromRoute] string id) =>
+{
+    var produtoARemover = produtos.FirstOrDefault(p => p.Id == id);
+    if (produtoARemover != null)
+    {
+        produtos.Remove(produtoARemover);
+        return Results.Ok();
+    }
+    else
+    {
+        return Results.NotFound("Produto não encontrado.");
+    }
+});
 
 app.Run();
-
