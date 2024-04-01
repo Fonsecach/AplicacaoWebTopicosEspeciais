@@ -12,12 +12,19 @@ namespace Backend.Models
         public string? Descricao { get; set; }
         public decimal Preco { get; set; }
 
-        public Produto(string id, string nome, string descricao, decimal preco)
+        public DateTime CriadoEm { get; set; }
+
+        public Produto()
         {
-            Id = id;
+
+        }
+        public Produto(string nome, string descricao, decimal preco)
+        {
+            Id = Guid.NewGuid().ToString();
             Nome = nome;
             Descricao = descricao;
             Preco = preco;
+            CriadoEm = DateTime.Now;
         }
     }
 }

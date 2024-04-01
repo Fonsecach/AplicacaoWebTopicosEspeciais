@@ -10,10 +10,10 @@ var app = builder.Build();
 
 List<Produto> produtos = new List<Produto>
 {
-    new Produto("a12", "Iphone", "15-Pro", 15000.00m),
-    new Produto("a13", "Notebook", "Vaio", 2500.00m),
-    new Produto("a14", "Notebook", "Dell", 4000.00m),
-    new Produto("x97", "PlayStation", "5", 5000.00m)
+    new Produto("Iphone", "15-Pro", 15000.00m),
+    new Produto("Notebook", "Vaio", 2500.00m),
+    new Produto("Notebook", "Dell", 4000.00m),
+    new Produto("PlayStation", "5", 5000.00m)
 };
 
 app.MapGet("/api/produtos", () => produtos);
@@ -31,7 +31,7 @@ app.MapGet("/api/produto/{id}", ([FromRoute] string id) =>
     }
 });
 
-app.MapPost("/api/produto", ([FromBody] Produto novoProduto) => 
+app.MapPost("/api/produto", ([FromBody] Produto novoProduto) =>
 {
     if (novoProduto == null)
     {
@@ -39,7 +39,7 @@ app.MapPost("/api/produto", ([FromBody] Produto novoProduto) =>
     }
 
     produtos.Add(novoProduto);
-    return Results.Ok(novoProduto);
+    return Results.Created("", novoProduto);
 });
 
 app.MapPut("/api/produto/{id}", ([FromRoute] string id, [FromBody] Produto produtoAlterado) =>
