@@ -11,20 +11,21 @@ namespace Backend.Models
         public string? Nome { get; set; }
         public string? Descricao { get; set; }
         public decimal Preco { get; set; }
-
         public DateTime CriadoEm { get; set; }
+        public int? Quantidade {get; set;}
 
         public Produto()
         {
 
         }
-        public Produto(string nome, string descricao, decimal preco)
+        public Produto(string nome, string descricao, decimal preco, int quantidade)
         {
             Id = Guid.NewGuid().ToString();
             Nome = nome;
             Descricao = descricao;
             Preco = preco;
             CriadoEm = DateTime.Now;
+            Quantidade = quantidade;
         }
     }
 }

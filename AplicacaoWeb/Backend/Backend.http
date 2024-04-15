@@ -5,7 +5,7 @@ GET {{Backend_HostAddress}}/api/produtos
 
 ###
 # Buscar um produto pelo ID
-GET {{Backend_HostAddress}}/api/produto/e5754f12-d78a-49b3-a10b-fd0a2b3b2f8f
+GET {{Backend_HostAddress}}/api/produto/db8f0e39-7faa-4335-970b-2e0ccf75e1ae
 
 ###
 # Cadastrar um novo produto
@@ -14,16 +14,31 @@ Content-Type: application/json
 
 
 {
-  "Id": "51b8f4f0-d78a-49b3-a10b-fd0a2b3b2f8f",
-  "Nome": "Smartwatch",
-  "Marca": "Samsung",
-  "Modelo": "Galaxy Watch",
-  "Preco": 1500.00
+  "Id": "e5754f12-d78a-49b3-a10b-fd0a2b3b2f7f",
+  "Nome": "Samsung",
+  "Descricao": "Galaxy Watch",
+  "Preco": 1500.00,
+  "Quantidade": 5
 }
 
+####
+POST {{Backend_HostAddress}}/api/produto
+Content-Type: application/json
+
+
+{
+  "Id": "51b8f4f0-d78a-49b3-a10b-fd0a2b3b2f8f",
+  "Nome": "Iphone",
+  "Descricao": "15-Pro",
+  "Preco": 1000.00,
+  "Quantidade": 2
+}
+
+
 ###
+
 # Alterar um produto pelo ID
-PUT {{Backend_HostAddress}}/api/produto/e5754f12-d78a-49b3-a10b-fd0a2b3b2f8f
+PUT {{Backend_HostAddress}}/api/produto/51b8f4f0-d78a-49b3-a10b-fd0a2b3b2f8f
 Content-Type: application/json
 
 {

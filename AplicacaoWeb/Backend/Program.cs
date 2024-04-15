@@ -3,20 +3,28 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+//registrar o serviço de banco de dados na app
+builder.Services.AddDbContext<AppDataContext>();
 
 var app = builder.Build();
 
 List<Produto> produtos = new List<Produto>
 {
-    new Produto("Iphone", "15-Pro", 15000.00m),
-    new Produto("Notebook", "Vaio", 2500.00m),
-    new Produto("Notebook", "Dell", 4000.00m),
-    new Produto("PlayStation", "5", 5000.00m)
+    new Produto("Iphone", "15-Pro", 15000.00m, 1),
+    new Produto("Notebook", "Vaio", 2500.00m, 5),
+    new Produto("Notebook", "Dell", 4000.00m, 0),
+    new Produto("PlayStation", "5", 5000.00m, 2)
 };
 
-app.MapGet("/api/produtos", () => produtos);
+app.MapGet("/api/produtos", async ([FromServices] AppDataContext contextProdutos) =>
+{
+    var produtos = await contextProdutos.Produtos.ToListAsync();
+    return produtos;
+});
+
 
 app.MapGet("/api/produto/{id}", ([FromRoute] string id) =>
 {
@@ -31,16 +39,27 @@ app.MapGet("/api/produto/{id}", ([FromRoute] string id) =>
     }
 });
 
-app.MapPost("/api/produto", ([FromBody] Produto novoProduto) =>
+app.MapPost("/api/produto", async ([FromBody] Produto produto, [FromServices] AppDataContext contextProdutos) =>
 {
-    if (novoProduto == null)
+    if (produto == null)
     {
         return Results.BadRequest("O produto enviado é inválido.");
     }
 
-    produtos.Add(novoProduto);
-    return Results.Created("", novoProduto);
+    // Verificar se o ID já existe no banco de dados
+    var existingProduto = await contextProdutos.Produtos.FindAsync(produto.Id);
+    if (existingProduto != null)
+    {
+        return Results.BadRequest("Já existe um produto com o mesmo ID.");
+    }
+
+    contextProdutos.Produtos.Add(produto);
+    await contextProdutos.SaveChangesAsync();
+
+    return Results.Created("", produto);
 });
+
+
 
 app.MapPut("/api/produto/{id}", ([FromRoute] string id, [FromBody] Produto produtoAlterado) =>
 {
