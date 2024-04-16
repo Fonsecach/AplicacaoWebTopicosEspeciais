@@ -21,23 +21,27 @@ List<Produto> produtos = new List<Produto>
 
 app.MapGet("/api/produtos", async ([FromServices] AppDataContext contextProdutos) =>
 {
-    var produtos = await contextProdutos.Produtos.ToListAsync();
-    return produtos;
+    if(context.Produtos.Any())
+    {
+        var produtos = await contextProdutos.Produtos.ToListAsync();
+        return Results.Ok(produtos);
+    }
+    return Results.NotFound("nenhum produto registrado");
 });
 
 
-app.MapGet("/api/produto/{id}", ([FromRoute] string id) =>
+app.MapGet("/api/produto/{id}", ([FromRoute] string id, [FromServices] AppDataContext context) =>
 {
-    var produto = produtos.FirstOrDefault(p => p.Id == id);
-    if (produto != null)
-    {
-        return Results.Ok(produto);
-    }
-    else
+    Produto? produto = context.Produtos.FirstOrDefault(p => p.Id == id);
+
+    if (produto is null)
     {
         return Results.NotFound("Produto não encontrado.");
     }
+
+    return Results.Ok(produto);
 });
+
 
 app.MapPost("/api/produto", async ([FromBody] Produto produto, [FromServices] AppDataContext contextProdutos) =>
 {
