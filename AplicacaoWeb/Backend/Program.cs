@@ -21,7 +21,7 @@ List<Produto> produtos = new List<Produto>
 
 app.MapGet("/api/produtos", async ([FromServices] AppDataContext contextProdutos) =>
 {
-    if(context.Produtos.Any())
+    if(contextProdutos.Produtos.Any())
     {
         var produtos = await contextProdutos.Produtos.ToListAsync();
         return Results.Ok(produtos);
