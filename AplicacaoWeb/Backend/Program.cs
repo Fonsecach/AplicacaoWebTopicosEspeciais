@@ -6,33 +6,24 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-//registrar o serviço de banco de dados na app
+// Registrar o serviço de banco de dados na app
 builder.Services.AddDbContext<AppDataContext>();
 
 var app = builder.Build();
 
-List<Produto> produtos = new List<Produto>
-{
-    new Produto("Iphone", "15-Pro", 15000.00m, 1),
-    new Produto("Notebook", "Vaio", 2500.00m, 5),
-    new Produto("Notebook", "Dell", 4000.00m, 0),
-    new Produto("PlayStation", "5", 5000.00m, 2)
-};
-
 app.MapGet("/api/produtos", async ([FromServices] AppDataContext contextProdutos) =>
 {
-    if(contextProdutos.Produtos.Any())
+    var produtos = await contextProdutos.Produtos.ToListAsync();
+    if (produtos.Any())
     {
-        var produtos = await contextProdutos.Produtos.ToListAsync();
         return Results.Ok(produtos);
     }
-    return Results.NotFound("nenhum produto registrado");
+    return Results.NotFound("Nenhum produto registrado");
 });
 
-
-app.MapGet("/api/produto/{id}", ([FromRoute] string id, [FromServices] AppDataContext context) =>
+app.MapGet("/api/produto/{id}", async ([FromRoute] string id, [FromServices] AppDataContext context) =>
 {
-    Produto? produto = context.Produtos.FirstOrDefault(p => p.Id == id);
+    var produto = await context.Produtos.FindAsync(id);
 
     if (produto is null)
     {
@@ -41,7 +32,6 @@ app.MapGet("/api/produto/{id}", ([FromRoute] string id, [FromServices] AppDataCo
 
     return Results.Ok(produto);
 });
-
 
 app.MapPost("/api/produto", async ([FromBody] Produto produto, [FromServices] AppDataContext contextProdutos) =>
 {
@@ -63,34 +53,37 @@ app.MapPost("/api/produto", async ([FromBody] Produto produto, [FromServices] Ap
     return Results.Created("", produto);
 });
 
-
-
-app.MapPut("/api/produto/{id}", ([FromRoute] string id, [FromBody] Produto produtoAlterado) =>
+app.MapPut("/api/produto/{id}", async ([FromRoute] string id, [FromBody] Produto produtoAlterado, [FromServices] AppDataContext contextProdutos) =>
 {
-    var index = produtos.FindIndex(p => p.Id == id);
-    if (index != -1)
-    {
-        produtos[index] = produtoAlterado;
-        return Results.Ok(produtoAlterado);
-    }
-    else
+    var existingProduto = await contextProdutos.Produtos.FindAsync(id);
+    if (existingProduto == null)
     {
         return Results.NotFound("Produto não encontrado.");
     }
+
+    existingProduto.Nome = produtoAlterado.Nome;
+    existingProduto.Descricao = produtoAlterado.Descricao;
+    existingProduto.Preco = produtoAlterado.Preco;
+    existingProduto.Quantidade = produtoAlterado.Quantidade;
+
+    await contextProdutos.SaveChangesAsync();
+
+    return Results.Ok(existingProduto);
 });
 
-app.MapDelete("/api/produto/{id}", ([FromRoute] string id) =>
+app.MapDelete("/api/produto/{id}", async ([FromRoute] string id, [FromServices] AppDataContext contextProdutos) =>
 {
-    var produtoARemover = produtos.FirstOrDefault(p => p.Id == id);
-    if (produtoARemover != null)
+    var produto = await contextProdutos.Produtos.FindAsync(id);
+
+    if (produto is null)
     {
-        produtos.Remove(produtoARemover);
-        return Results.Ok();
+        return Results.NotFound("Produto não encontrado!");
     }
-    else
-    {
-        return Results.NotFound("Produto não encontrado.");
-    }
+
+    contextProdutos.Produtos.Remove(produto);
+    await contextProdutos.SaveChangesAsync();
+
+    return Results.Ok(produto);
 });
 
 app.Run();

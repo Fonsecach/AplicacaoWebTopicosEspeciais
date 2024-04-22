@@ -14,7 +14,7 @@ Content-Type: application/json
 
 
 {
-  "Id": "e5754f12-d78a-49b3-a10b-fd0a2b3b2f7f",
+  "Id": "e5754f12-d78a-49b3-a10b-fd0a2b3b9f7f",
   "Nome": "Samsung",
   "Descricao": "Galaxy Watch",
   "Preco": 1500.00,
